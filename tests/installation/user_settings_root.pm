@@ -16,7 +16,7 @@ sub run() {
 
     # PW too easy (cracklib)
     # If check_screen added to workaround bsc#937012
-    if (check_screen('inst-userpasswdtoosimple', 13)) {
+    if (check_screen('inst-rootpasswdtoosimple', 13)) {
         send_key "ret";
     }
     else {
