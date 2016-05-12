@@ -32,12 +32,12 @@ sub run() {
 
 ### Install everything from the local repo since it's way tooooooo slow to refresh the repo
         if ($version eq "13.2") {
-            assert_script_run("curl -L -v " . autoinst_url('/data/moktest/shim-0.9-5.26.x86_64.rpm') . " > shim-0.9-5.26.x86_64.rpm");
-            assert_script_run("curl -L -v " . autoinst_url('/data/moktest/mokutil-0.2.0-11.1.2.x86_64.rpm') . " > mokutil-0.2.0-11.1.2.x86_64.rpm");
+            assert_script_run("curl -L -v -f " . autoinst_url('/data/moktest/shim-0.9-5.26.x86_64.rpm') . " > shim-0.9-5.26.x86_64.rpm");
+            assert_script_run("curl -L -v -f " . autoinst_url('/data/moktest/mokutil-0.2.0-11.1.2.x86_64.rpm') . " > mokutil-0.2.0-11.1.2.x86_64.rpm");
         }
         elsif ($version eq "42.1") {
-            assert_script_run("curl -L -v " . autoinst_url('/data/moktest/libefivar0-0.21-1.1.x86_64.rpm') . " > libefivar0-0.21-1.1.x86_64.rpm");
-            assert_script_run("curl -L -v " . autoinst_url('/data/moktest/mokutil-0.3.0-2.2.x86_64.rpm') . " > mokutil-0.3.0-2.2.x86_64.rpm");
+            assert_script_run("curl -L -v -f " . autoinst_url('/data/moktest/libefivar0-0.21-1.1.x86_64.rpm') . " > libefivar0-0.21-1.1.x86_64.rpm");
+            assert_script_run("curl -L -v -f " . autoinst_url('/data/moktest/mokutil-0.3.0-2.2.x86_64.rpm') . " > mokutil-0.3.0-2.2.x86_64.rpm");
         }
         assert_script_run("rpm -Uvh *.rpm");
         assert_script_run("rm -f *.rpm");
