@@ -3,24 +3,34 @@ use testapi;
 use utils;
 
 sub run() {
-    my $self = shift;
-    my $distri  = get_var("DISTRI");
+    my $self      = shift;
+    my $distri    = get_var("DISTRI");
     my $devel_key = 'data/shim-devel.der';
+    my $efi_dir   = undef;
+    my $flavor    = undef;
+    my $devel     = undef;
 
     select_console 'user-console';
-    # install the new shim
+
     if ($distri eq "opensuse") {
-        assert_script_run("curl -L -v " . autoinst_url('/data/newshim/shim-opensuse.rpm') . " > shim-opensuse.rpm");
-        assert_script_sudo("rpm -Uvh --force shim-opensuse.rpm");
-        assert_script_run("cmp -s /boot/efi/EFI/opensuse/shim.efi /usr/lib64/efi/shim-devel.efi");
-        assert_script_sudo("cp /usr/lib64/efi/shim-opensuse.efi -f /boot/efi/EFI/opensuse/shim.efi");
+        $efi_dir = "opensuse";
+        $flavor  = "opensuse";
+    } elsif ($distri eq "sle-12") {
+        $efi_dir = "sles";
+        $flavor  = "sles";
+    } elsif ($distri eq "sle-12") {
+    } elsif ($distri eq "sle-11") {
+        $efi_dir = "SuSE";
+        $flavor  = "sles";
+    } else {
+        die;
     }
-    else {
-        assert_script_run("curl -L -v " . autoinst_url('/data/newshim/shim-sles.rpm') . " > shim-sles.rpm");
-        assert_script_sudo("rpm -Uvh --force shim-sles.rpm");
-        assert_script_run("cmp -s /boot/efi/EFI/SuSE/shim.efi /usr/lib64/efi/shim-devel.efi");
-        assert_script_sudo("cp /usr/lib64/efi/shim-sles.efi -f /boot/efi/EFI/SuSE/shim.efi");
-    }
+
+    # install the new shim
+    assert_script_run("curl -L -v " . autoinst_url("/data/newshim/shim-$distri.rpm") . " > shim-$distri.rpm");
+    assert_script_sudo("rpm -Uvh --force shim-$distri.rpm");
+    assert_script_run("cmp -s /boot/efi/EFI/$efi_dir/shim.efi /usr/lib64/efi/shim-devel.efi");
+    assert_script_sudo("cp /usr/lib64/efi/shim-$flavor.efi -f /boot/efi/EFI/$efi_dir/shim.efi");
     assert_script_run("rm -f shim-*.rpm");
     script_sudo("cp -f /usr/lib64/efi/shim-devel.der /boot/efi/EFI/shim-key.der");
     # boot to the firmware UI
@@ -101,6 +111,7 @@ sub run() {
     send_key "down";
     send_key "down";
     send_key "down";
+    save_screenshot;
     assert_screen("ovmf-choose-shim-key");
     # Choose shim-key.der
     send_key "ret";
