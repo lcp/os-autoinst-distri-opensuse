@@ -719,7 +719,7 @@ sub load_moktests () {
     if (moktest_is_applicable) {
         loadtest "moktest/mok_setup.pm";
         # XXX Enroll a devel key
-        #loadtest "moktest/enroll_devel_key.pm";
+        loadtest "moktest/enroll_devel_key.pm";
         loadtest "moktest/mok_import.pm";
         loadtest "moktest/mok_delete.pm";
         loadtest "moktest/mok_import_hash.pm";
@@ -799,6 +799,7 @@ elsif (get_var("Y2UITEST")) {
     load_yast2ui_tests();
 }
 elsif (get_var("MOKTEST")){
+    loadtest "installation/bootloader_uefi.pm";
     loadtest "boot/boot_to_desktop.pm";
     load_moktests();
 }
