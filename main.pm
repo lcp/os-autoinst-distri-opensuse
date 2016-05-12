@@ -229,7 +229,6 @@ sub snapper_is_applicable() {
 }
 
 sub moktest_is_applicable() {
-    #return (get_var("UEFI") || get_var("UEFI_PFLASH")) && !get_var("INSTALLONLY") && !get_var("NICEVIDEO") && !get_var("DUALBOOT") && !get_var("RESCUECD");
     return (get_var("UEFI") || get_var("UEFI_PFLASH")) && !get_var("INSTALLONLY") && !get_var("NICEVIDEO") && !get_var("DUALBOOT") && !get_var("RESCUECD");
 }
 
@@ -718,7 +717,6 @@ sub load_autoyast_tests() {
 sub load_moktests () {
     if (moktest_is_applicable) {
         loadtest "moktest/mok_setup.pm";
-        # XXX Enroll a devel key
         loadtest "moktest/enroll_devel_key.pm";
         loadtest "moktest/mok_import.pm";
         loadtest "moktest/mok_delete.pm";
@@ -799,13 +797,9 @@ elsif (get_var("Y2UITEST")) {
     load_yast2ui_tests();
 }
 elsif (get_var("MOKTEST")){
-    loadtest "installation/bootloader_uefi.pm";
+    loadtest "boot/boot_uefi_hdd.pm";
     loadtest "boot/boot_to_desktop.pm";
     load_moktests();
-}
-elsif (get_var("FWKEYADD")){
-    loadtest "boot/boot_to_desktop.pm";
-    loadtest "moktest/enroll_devel_key.pm";
 }
 else {
     if (get_var("LIVETEST")) {
