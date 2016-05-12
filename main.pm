@@ -228,6 +228,11 @@ sub snapper_is_applicable() {
     return ($fs eq "btrfs" && get_var("HDDSIZEGB", 10) > 10);
 }
 
+sub moktest_is_applicable() {
+    #return (get_var("UEFI") || get_var("UEFI_PFLASH")) && !get_var("INSTALLONLY") && !get_var("NICEVIDEO") && !get_var("DUALBOOT") && !get_var("RESCUECD");
+    return (get_var("UEFI") || get_var("UEFI_PFLASH")) && !get_var("INSTALLONLY") && !get_var("NICEVIDEO") && !get_var("DUALBOOT") && !get_var("RESCUECD");
+}
+
 sub need_clear_repos() {
     return get_var("FLAVOR", '') =~ m/^Staging2?[\-]DVD$/;
 }
@@ -710,6 +715,24 @@ sub load_autoyast_tests() {
     #    next boot in load_reboot_tests
 }
 
+sub load_moktests () {
+    if (moktest_is_applicable) {
+        loadtest "moktest/mok_setup.pm";
+        # XXX Enroll a devel key
+        #loadtest "moktest/enroll_devel_key.pm";
+        loadtest "moktest/mok_import.pm";
+        loadtest "moktest/mok_delete.pm";
+        loadtest "moktest/mok_import_hash.pm";
+        loadtest "moktest/mok_delete_hash.pm";
+        loadtest "moktest/mokx_import.pm";
+        loadtest "moktest/mokx_delete.pm";
+        loadtest "moktest/mokx_import_hash.pm";
+        loadtest "moktest/mokx_delete_hash.pm";
+        loadtest "moktest/mok_finish.pm";
+        loadtest "console/consoletest_finish.pm"
+    }
+}
+
 # load the tests in the right order
 if (get_var("REGRESSION")) {
     if (get_var("KEEPHDDS")) {
@@ -774,6 +797,10 @@ elsif (get_var("Y2UITEST")) {
     # back to desktop
     loadtest "console/consoletest_finish.pm";
     load_yast2ui_tests();
+}
+elsif (get_var("MOKTEST")){
+    loadtest "boot/boot_to_desktop.pm";
+    load_moktests();
 }
 else {
     if (get_var("LIVETEST")) {
