@@ -3,11 +3,22 @@ use testapi;
 
 sub run() {
     my $self = shift;
+    my $distri  = get_var("DISTRI");
+
+    check_screen([qw/bootloader-shim-import-prompt bootloader-grub2/], 15);
+    if (match_has_tag("bootloader-shim-import-prompt")) {
+        send_key "down";
+        send_key "ret";
+    }
 
     # Remove the DVD
     assert_screen "bootloader-grub2", 15;
     eject_cd;
     power("reset");
+
+    if ($distri ne "sle-11") {
+        return;
+    }
 
     assert_screen("ovmf-start");
 
