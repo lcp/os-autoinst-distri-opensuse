@@ -4,12 +4,25 @@ use utils;
 
 sub run() {
     my $self = shift;
+    my $distri  = get_var("DISTRI");
     my $devel_key = 'data/shim-devel.der';
 
     select_console 'user-console';
-    assert_script_run("curl -L -v " . autoinst_url('data/shim-devel.der') . " > shim-key.der");
-    # TODO install the new shim
-    script_sudo("cp -f shim-key.der /boot/efi/EFI/shim-key.der");
+    # install the new shim
+    if ($distri eq "opensuse") {
+        assert_script_run("curl -L -v " . autoinst_url('/data/newshim/shim-opensuse.rpm') . " > shim-opensuse.rpm");
+        assert_script_sudo("rpm -Uvh --force shim-opensuse.rpm");
+        assert_script_run("cmp -s /boot/efi/EFI/opensuse/shim.efi /usr/lib64/efi/shim-devel.efi");
+        assert_script_sudo("cp /usr/lib64/efi/shim-opensuse.efi -f /boot/efi/EFI/opensuse/shim.efi");
+    }
+    else {
+        assert_script_run("curl -L -v " . autoinst_url('/data/newshim/shim-sles.rpm') . " > shim-sles.rpm");
+        assert_script_sudo("rpm -Uvh --force shim-sles.rpm");
+        assert_script_run("cmp -s /boot/efi/EFI/SuSE/shim.efi /usr/lib64/efi/shim-devel.efi");
+        assert_script_sudo("cp /usr/lib64/efi/shim-sles.efi -f /boot/efi/EFI/SuSE/shim.efi");
+    }
+    assert_script_run("rm -f shim-*.rpm");
+    script_sudo("cp -f /usr/lib64/efi/shim-devel.der /boot/efi/EFI/shim-key.der");
     # boot to the firmware UI
     assert_script_sudo("echo -ne \"\\x07\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\" > /sys/firmware/efi/efivars/OsIndications-8be4df61-93ca-11d2-aa0d-00e098032b8c");
 
@@ -81,8 +94,10 @@ sub run() {
     wait_idle;
     save_screenshot;
 
-    # Choose <opensuse>
-    send_key "down";
+    # Choose shim-key.der
+    if ($distri ne "sle-11") {
+        send_key "down";
+    }
     send_key "down";
     send_key "down";
     send_key "down";
@@ -120,6 +135,7 @@ sub run() {
     select_console 'user-console';
 
     assert_script_sudo "chown $username /dev/$serialdev";
+    assert_script_sudo "rm -f /boot/efi/EFI/shim-key.der";
 }
 
 sub test_flags() {
