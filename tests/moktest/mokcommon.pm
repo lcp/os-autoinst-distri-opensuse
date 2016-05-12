@@ -35,7 +35,7 @@ sub do_mokmanager {
     # Reboot the system to MokManager
     select_console 'user-console';
     become_root;
-    script_run("reboot");
+    type_string "reboot\n";
     reset_consoles;
 
     assert_screen "mokmanager", 300;
