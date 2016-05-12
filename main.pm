@@ -802,6 +802,10 @@ elsif (get_var("MOKTEST")){
     loadtest "boot/boot_to_desktop.pm";
     load_moktests();
 }
+elsif (get_var("FWKEYADD")){
+    loadtest "boot/boot_to_desktop.pm";
+    loadtest "moktest/enroll_devel_key.pm";
+}
 else {
     if (get_var("LIVETEST")) {
         load_boot_tests();
